@@ -15,9 +15,11 @@ Imports:
   dplyr,
   future,
   lidR (>= 4.3.0),
+  rlas (>= 1.8.2),
   sf,
   tools,
   utils,
   vctrs (>= 0.7.1)
 Remotes:
+  r-lidar/rlas,
   r-lidar/lidR
