@@ -6,10 +6,15 @@
 #' files, laszip from lastools (rapidLasso) would be a more efficient solution.
 #'
 #' @param ctg_folder Path pointing to a folder filled with las files.
+#' @param overwrite If set to `TRUE`, overwrite the existing laz files.
 #' @param remove_original If `TRUE`, remove the original las files.
 #'
 #' @noRd
-catalogCompression <- function(ctg_folder, remove_original = FALSE) {
+catalogCompression <- function(
+  ctg_folder,
+  overwrite = FALSE,
+  remove_original = FALSE
+) {
 
   files <- list.files(
     ctg_folder,
@@ -21,7 +26,7 @@ catalogCompression <- function(ctg_folder, remove_original = FALSE) {
   for (f in files) {
     laz_file <- paste0(tools::file_path_sans_ext(f), ".laz")
 
-    if (file.exists(laz_file)) {
+    if (file.exists(laz_file) & !isTRUE(overwrite)) {
       message("Skipping, already exists: ", laz_file)
       next
     }

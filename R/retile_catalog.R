@@ -10,6 +10,7 @@
 #' @param ctg_path Folder containing the las/laz files to create the catalog.
 #' @param chunk_opts A list with the required parameters to retile the
 #'   `LAScatalog`. It comes from the function `checkTileGrid`.
+#' @param overwrite If `TRUE`, overwrite the a prior retiled catalog,
 #' @param n_workers When parallel computation is activated, the number of worker
 #'   or CPU cores to use.
 #' @param parallel If `TRUE`, compute the new tiles in asynchronous way.
@@ -19,6 +20,7 @@
 retileCatalog <- function(
     ctg_path,
     chunk_opts,
+    overwrite = FALSE,
     n_workers = NULL,
     parallel = TRUE
 ) {
@@ -32,8 +34,29 @@ retileCatalog <- function(
   lidR::opt_laz_compression(ctg) <- TRUE
 
   out_dir <- file.path(ctg_path, "retiled")
+
   if (!dir.exists(out_dir)) {
     dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  } else if (!isTRUE(overwrite)) {
+    message(paste0(
+      "A prior retiled catalog exists. To modify it, set `overwrite=TRUE`. ",
+      "The existing retiled directory is returned."
+    ))
+    return(out_dir)
+  }
+
+  # Remove existing retiled LAS/LAZ files when overwrite = TRUE
+  if (isTRUE(overwrite)) {
+    old_tiles <- list.files(
+      out_dir,
+      pattern = "\\.(las|laz)$",
+      full.names = TRUE,
+      ignore.case = TRUE
+    )
+
+    if (length(old_tiles) > 0) {
+      file.remove(old_tiles)
+    }
   }
 
   lidR::opt_output_files(ctg) <- file.path(out_dir, "retile_{XLEFT}_{YBOTTOM}")
@@ -50,7 +73,7 @@ retileCatalog <- function(
     }
   }
 
-  retiled_ctg <- lidR::catalog_retile(ctg)
+  lidR::catalog_retile(ctg)
   return(out_dir)
 }
 
