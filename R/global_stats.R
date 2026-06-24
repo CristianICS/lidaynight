@@ -25,7 +25,7 @@ globalStats <- function(
 
   stats <- lidR::plot_metrics(
     ctg,
-    ~roi_global_metrics(
+    ~lidaynight::roi_global_metrics(
       Z = Z,
       X = X,
       Y = Y,
@@ -105,7 +105,7 @@ globalStats <- function(
 #' @param X Coordinate X of the point. Required only to compute duplicate points
 #' @param Y Coordinate X of the point. Required only to compute duplicate points
 #' @return A named list with the computed metrics.
-#' @noRd
+#' @export
 roi_global_metrics <- function(
     Z,
     Intensity,
