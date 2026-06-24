@@ -20,4 +20,5 @@ Imports:
   utils,
   vctrs (>= 0.7.1)
 Remotes:
-  r-lidar/lidR
+  r-lidar/lidR,
+  r-lidar/rlas
