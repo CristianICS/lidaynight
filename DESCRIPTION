@@ -1,0 +1,23 @@
+Package: lidaynight
+Title: Conduct a LiDAR Day/Night Comparisson Study
+Version: 0.0.0.9000
+Authors@R: 
+    person("Cristian", "Iranzo", , "c.iranzo@unizar.es", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-3359-6213"))
+Description: Contains the functions and data to produce the statistic files and
+    report documents with the comparisson between day and night LiDAR flights.
+License: Apache License (== 2.0)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+  data.table,
+  dplyr,
+  future,
+  lidR (>= 4.3.0),
+  sf,
+  tools,
+  utils,
+  vctrs (>= 0.7.1)
+Remotes:
+  r-lidar/lidR
