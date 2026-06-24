@@ -9,7 +9,7 @@
 #' @param overwrite If set to `TRUE`, overwrite the existing laz files.
 #' @param remove_original If `TRUE`, remove the original las files.
 #'
-#' @noRd
+#' @export
 catalogCompression <- function(
   ctg_folder,
   overwrite = FALSE,

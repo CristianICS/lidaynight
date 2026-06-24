@@ -84,7 +84,7 @@ retileCatalog <- function(
 #' @param chunk_buffer The desired `opt_buffer_size`.
 #' @param alignment If `TRUE`, align the grid with the catalog bounds.
 #' @param check If `TRUE`, produce a fast check of the LAScatalog.
-#' @noRd
+#' @export
 checkTileGrid <- function(
     ctg_folder,
     chunk_size=250,

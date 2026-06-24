@@ -4,13 +4,21 @@
 \alias{retileCatalog}
 \title{Retile the original point cloud files}
 \usage{
-retileCatalog(ctg_path, chunk_opts, n_workers = NULL, parallel = TRUE)
+retileCatalog(
+  ctg_path,
+  chunk_opts,
+  overwrite = FALSE,
+  n_workers = NULL,
+  parallel = TRUE
+)
 }
 \arguments{
 \item{ctg_path}{Folder containing the las/laz files to create the catalog.}
 
 \item{chunk_opts}{A list with the required parameters to retile the
 \code{LAScatalog}. It comes from the function \code{checkTileGrid}.}
+
+\item{overwrite}{If \code{TRUE}, overwrite the a prior retiled catalog,}
 
 \item{n_workers}{When parallel computation is activated, the number of worker
 or CPU cores to use.}
