@@ -4,7 +4,13 @@
 \alias{globalStats}
 \title{ROI/QA LiDAR metrics (extended)}
 \usage{
-globalStats(ctg_folder, roi_path, out_path, out_name = "roi_stats.csv")
+globalStats(
+  ctg_folder,
+  roi_path,
+  out_path,
+  out_name = "roi_stats.csv",
+  layer_name = NULL
+)
 }
 \arguments{
 \item{ctg_folder}{Path pointing to the folder containing the laz files.}
@@ -14,6 +20,8 @@ globalStats(ctg_folder, roi_path, out_path, out_name = "roi_stats.csv")
 \item{out_path}{Folder where  \code{out_name} will be written.}
 
 \item{out_name}{Output CSV file name.}
+
+\item{layer_name}{The name of the layer to load from the spatial database.}
 }
 \value{
 Invisibly, a list with the summarized statistics.

@@ -6,6 +6,7 @@
 \usage{
 checkTileGrid(
   ctg_folder,
+  out_dir,
   chunk_size = 250,
   chunk_buffer = 0,
   alignment = TRUE,
@@ -14,6 +15,8 @@ checkTileGrid(
 }
 \arguments{
 \item{ctg_folder}{Directory where the point clouds are stored.}
+
+\item{out_dir}{Path to the \code{results} directory.}
 
 \item{chunk_size}{The desired \code{opt_chunk_size}.}
 
@@ -24,5 +27,9 @@ checkTileGrid(
 \item{check}{If \code{TRUE}, produce a fast check of the LAScatalog.}
 }
 \description{
-Inspect and decide the best chunk parameters to retile the catalog
+The grid params are stored inside the \code{results} to open later inside the
+function \code{\link[=retileCatalog]{retileCatalog()}}.
+}
+\details{
+The produced grid is saved inside the \code{results} directory as a png plot.
 }
