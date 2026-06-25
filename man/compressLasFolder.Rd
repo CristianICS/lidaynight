@@ -16,13 +16,13 @@ compressLasFolder(
 
 \item{overwrite}{If \code{TRUE}, overwrite existing \code{.laz} files.}
 
-\item{remove_original}{If \code{TRUE}, remove the original \code{.las} file after the
-corresponding \code{.laz} file has been succesfully written.}
-
-\item{create_laxIf}{\code{TRUE}, create \code{.lax} spatial index files.
+\item{create_lax}{If \code{TRUE}, create \code{.lax} spatial index files.
 For newly written \code{.laz} files, this is handled by \code{\link[lidR:writeLAS]{lidR::writeLAS()}}.
 For existing \code{.laz} files skipped because \code{overwrite = FALSE}, a missing
 \code{.lax} file is created with \code{\link[rlas:writelax]{rlas::writelax()}}.}
+
+\item{remove_original}{If \code{TRUE}, remove the original \code{.las} file after the
+corresponding \code{.laz} file has been succesfully written.}
 }
 \value{
 Invisibly returns \code{TRUE}.

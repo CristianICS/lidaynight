@@ -11,7 +11,7 @@
 #'
 #' @param ctg_folder Path to a folder containing `.las` files.
 #' @param overwrite If `TRUE`, overwrite existing `.laz` files.
-#' @param create_laxIf `TRUE`, create `.lax` spatial index files.
+#' @param create_lax If `TRUE`, create `.lax` spatial index files.
 #'   For newly written `.laz` files, this is handled by [lidR::writeLAS()].
 #'   For existing `.laz` files skipped because `overwrite = FALSE`, a missing
 #'   `.lax` file is created with [rlas::writelax()].
