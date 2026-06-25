@@ -9,7 +9,8 @@ globalStats(
   roi_path,
   out_path,
   out_name = "roi_stats.csv",
-  layer_name = NULL
+  layer_name = NULL,
+  overwrite = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,9 @@ globalStats(
 \item{out_name}{Output CSV file name.}
 
 \item{layer_name}{The name of the layer to load from the spatial database.}
+
+\item{overwrite}{If \code{FALSE}, skips computation when either output
+file already exists. If \code{TRUE}, recomputes and overwrites existing outputs.}
 }
 \value{
 Invisibly, a list with the summarized statistics.
