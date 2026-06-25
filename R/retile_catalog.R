@@ -79,7 +79,13 @@ retileCatalog <- function(
 
 #' Inspect and decide the best chunk parameters to retile the catalog
 #'
+#' The grid params are stored inside the `results` to open later inside the
+#' function [retileCatalog()].
+#'
+#' The produced grid is saved inside the `results` directory as a png plot.
+#'
 #' @param ctg_folder Directory where the point clouds are stored.
+#' @param out_dir Path to the `results` directory.
 #' @param chunk_size The desired `opt_chunk_size`.
 #' @param chunk_buffer The desired `opt_buffer_size`.
 #' @param alignment If `TRUE`, align the grid with the catalog bounds.
@@ -87,6 +93,7 @@ retileCatalog <- function(
 #' @export
 checkTileGrid <- function(
     ctg_folder,
+    out_dir,
     chunk_size=250,
     chunk_buffer=0,
     alignment=TRUE,
@@ -110,13 +117,18 @@ checkTileGrid <- function(
     alignment <- c(0, 0)
   }
 
+  out_plot_name <- paste0("retile_chunk_grid_size_", chunk_size, ".png")
+  png(file.path(out_dir, out_plot_name), width=300, height = 300)
   lidR::plot(ctg, chunk_pattern=TRUE)
+  dev.off()
 
-  return(
-    list(
-      "size" = chunk_size,
-      "buffer" = chunk_buffer,
-      "alignment" = alignment
-    )
+  grid_params_list <- list(
+    "size" = chunk_size,
+    "buffer" = chunk_buffer,
+    "alignment" = alignment
   )
+
+  out_params_name <- "retile_chunk_params.rds"
+  saveRDS(grid_params_list, file=file.path(out_dir, out_params_name))
+  invisible(grid_params_list)
 }
