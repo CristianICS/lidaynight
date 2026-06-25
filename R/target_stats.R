@@ -4,7 +4,7 @@
 #' followings:
 #'
 #' * `road` - Points located in roads or good paths with no vegetation cover.
-#' * `shrub` - Area covered with bushes and shrubs with no or sparse trees.
+#' * `shrub` - Areas covered with bushes and shrubs with no or sparse trees.
 #' * `open_treed` - Areas with sparse trees but with understory.
 #' * `dense_treed` - High dense vegetated areas.
 #'
@@ -44,6 +44,7 @@ targetStats <- function(
 
   target_classes <- c(
     "road",
+    "shrub",
     "open_treed",
     "dense_treed"
   )
