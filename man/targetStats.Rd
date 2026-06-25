@@ -59,6 +59,7 @@ followings:
 \details{
 \itemize{
 \item \code{road} - Points located in roads or good paths with no vegetation cover.
+\item \code{shrub} - Areas covered with bushes and shrubs with no or sparse trees.
 \item \code{open_treed} - Areas with sparse trees but with understory.
 \item \code{dense_treed} - High dense vegetated areas.
 }
