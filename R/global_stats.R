@@ -5,6 +5,7 @@
 #'
 #' @param ctg_folder Path pointing to the folder containing the laz files.
 #' @param roi_path Vector layer to search the stats within.
+#' @param layer_name The name of the layer to load from the spatial database.
 #' @param out_path Folder where  `out_name` will be written.
 #' @param out_name Output CSV file name.
 #'
@@ -14,14 +15,15 @@ globalStats <- function(
     ctg_folder,
     roi_path,
     out_path,
-    out_name = "roi_stats.csv"
+    out_name = "roi_stats.csv",
+    layer_name = NULL
 ) {
   ctg <- openCatalog(ctg_folder)
 
   # Prevent to store the metrics in separate files
   lidR::opt_output_files(ctg) <- ""
 
-  roi <- openSpatial(roi_path, ctg)
+  roi <- openSpatial(roi_path, ctg, layer_name)
 
   stats <- lidR::plot_metrics(
     ctg,
