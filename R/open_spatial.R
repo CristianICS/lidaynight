@@ -22,10 +22,13 @@ openSpatial <- function(vector_path, ctg, layer_name = NULL) {
   if (is.null(layer_name)) {
     sf_obj <- sf::st_read(vector_path, quiet = TRUE)
   } else {
-    layers <- sf::st_layers(vector_path)
+    layers <- sf::st_layers(vector_path)$name
 
     if (!layer_name %in% layers) {
       layer_name <- layers[1]
+      warning(
+        "Layer '", layer_name, "' not found. Using first layer: '", layers[1], "'."
+      )
     }
 
     sf_obj <- sf::st_read(vector_path, layer=layer_name, quiet = TRUE)
