@@ -21,7 +21,7 @@
 #' @return Invisibly returns `TRUE`.
 #'
 #' @export
-catalogCompression <- function(
+compressLasFolder <- function(
   ctg_folder,
   overwrite = FALSE,
   create_lax = TRUE,
