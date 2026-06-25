@@ -8,8 +8,6 @@
 #' @param out_path Folder where  `out_name` will be written.
 #' @param out_name Output CSV file name.
 #' @param layer_name The name of the layer to load from the spatial database.
-#' @param overwrite If `FALSE`, skips computation when either output
-#'   file already exists. If `TRUE`, recomputes and overwrites existing outputs.
 #'
 #' @return Invisibly, a list with the summarized statistics.
 #' @export
@@ -18,23 +16,8 @@ globalStats <- function(
     roi_path,
     out_path,
     out_name = "roi_stats.csv",
-    layer_name = NULL,
-    overwrite = FALSE
+    layer_name = NULL
 ) {
-
-  csv_path <- file.path(out_path, out_name)
-  gpkg_path <- file.path(out_path, sub("\\.csv$", ".gpkg", out_name))
-
-  output_exists <- file.exists(csv_path) || file.exists(gpkg_path)
-
-  if (output_exists && !overwrite) {
-    message(
-      "Skipping globalStats(): output already exists. ",
-      "Use overwrite = TRUE to recompute and overwrite."
-    )
-    return(invisible(NULL))
-  }
-
   ctg <- openCatalog(ctg_folder)
 
   # Prevent to store the metrics in separate files
