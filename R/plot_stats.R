@@ -2,23 +2,6 @@
 #'
 #' The following functions are able to produce the plots to construct the
 #' reports for each site and the papers.
-#' @export
-
-
-# Show graphic with percentage tables between all the missions
-# Left column, day- Right column, night
-# Y axis, heights (from 40, bottom, to 100, top)
-
-.roi_stats <- list(
-  "Total number of points" = "n_pnts",
-  "Duplicated points (%)" = "dup_pnts_pct",
-  "First returns (%)" = "ret_1_pct",
-  "Second returns (%)" = "ret_2_pct",
-  "Third returns (%)" = "ret_3_pct",
-  "Points with only single returns (%)" = "ret_single_pct",
-  "Points with more than one return (%)" = "ret_abvone_pct",
-  "Points with negative heights (%)" = "pnts_negative_height_pct"
-)
 
 #' Parse acquisition metadata from a statistics folder name
 #'
@@ -73,7 +56,7 @@ parse_folder_metadata <- function(folder_path) {
 #' or more than one CSV file is found, an error is raised.
 read_stats_csv <- function(folder_path, stat_prefix) {
   pattern <- paste0(stat_prefix, "*.csv")
-  csv_files <- fs::dir_ls(folder_path, glob = pattern, type = "file")
+  csv_files <- list.files(folder_path, pattern = pattern, full.names = TRUE)
 
   if (length(csv_files) != 1) {
     stop(
@@ -121,6 +104,56 @@ read_one_stats_folder <- function(folder_path, stat_prefix) {
   )
 }
 
+#' Select custom columns for specific statistics files
+#'
+#' Project statistics files may contain many columns. For final reports and
+#' publications, only a subset of columns is usually required. This function
+#' selects the relevant columns according to the suffix used to identify the
+#' statistics file type. Optionally, the selected columns can be renamed using
+#' their display names. Mandatory ordering columns, such as `time` and
+#' `height`, are always included.
+#'
+#' @param stats A data frame containing merged statistics.
+#' @param suffix A character string identifying the statistics file type, such
+#'   as `"roi_stats"`.
+#' @param rename Logical. If `TRUE`, selected columns are renamed using their
+#'   display names. Mandatory columns keep their original names. Defaults
+#'   to `TRUE`.
+#'
+#' @return A data frame containing the mandatory ordering columns and the
+#'   selected statistics columns.
+select_stats_columns <- function(stats, suffix, rename = TRUE) {
+
+  stats_columns <- switch(
+    suffix,
+    roi_stats = .roi_stats,
+    bytarget_gf_dense_treed = .target_stats,
+    bytarget_gf_open_treed = .target_stats,
+    bytarget_gf_shrub = .target_stats,
+    bytarget_gf_road = .target_stats,
+    stop("Unsupported statistics suffix: ", suffix, call. = FALSE)
+  )
+
+  selected_columns <- c(.required_stats_columns, stats_columns)
+
+  missing_columns <- setdiff(unname(selected_columns), names(stats))
+
+  if (length(missing_columns) > 0) {
+    stop(
+      "The following required columns are missing from `stats`: ",
+      paste(missing_columns, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  selected_stats <- stats[, unname(selected_columns), drop = FALSE]
+
+  if (rename) {
+    names(selected_stats) <- names(selected_columns)
+  }
+
+  selected_stats
+}
 
 #' Load statistics from all acquisition folders
 #'
@@ -169,6 +202,7 @@ load_all_statistics <- function(
   stats <- lapply(folders, read_one_stats_folder, stat_prefix = stat_prefix)
 
   stats <- do.call(vctrs::vec_rbind, stats)
+  stats <- select_stats_columns(stats, stat_prefix)
 
   dplyr::mutate(
     stats,
@@ -200,7 +234,7 @@ load_all_statistics <- function(
 #'
 #' @examples
 #' \dontrun{
-#' stats_wide <- load_all_statistics("stats")
+#' stats_wide <- load_all_statistics("stats", "roi_stats")
 #' stats_long <- reshape_statistics_long(stats_wide)
 #' }
 #' @export
@@ -214,11 +248,11 @@ reshape_statistics_long <- function(stats_wide) {
 }
 
 
-#' Create a two-sided bar plot of statistics by height and acquisition time
+#' Create dodged bar plots of statistics by height and acquisition time
 #'
-#' Creates a faceted two-sided bar plot where each facet represents one
-#' statistic, the x-axis represents flight height, and bars are split by
-#' acquisition time.
+#' Creates a faceted dodged bar plot where each facet represents one statistic,
+#' the x-axis represents flight height, and day/night values are shown as
+#' side-by-side bars.
 #'
 #' @param stats_long A long-format data frame or tibble containing at least the
 #'   columns `time`, `height`, `statistic`, and `value`.
@@ -226,38 +260,44 @@ reshape_statistics_long <- function(stats_wide) {
 #' @return A `ggplot` object.
 #'
 #' @details
-#' Values associated with `"day"` are plotted as positive bars, while values
-#' associated with `"night"` are plotted as negative bars. The y-axis labels are
-#' displayed as absolute values, so the sign is used only to create the two-sided
-#' visual layout.
+#' Values for `"day"` and `"night"` are plotted as positive bars and separated
+#' using a dodged bar layout. This makes direct day-vs-night comparison possible
+#' within each flight-height category.
 #'
 #' The input should usually be produced by [reshape_statistics_long()].
 #'
 #' @examples
 #' \dontrun{
-#' stats_wide <- load_all_statistics("stats")
+#' stats_wide <- load_all_statistics("stats", "roi_stats")
 #' stats_long <- reshape_statistics_long(stats_wide)
-#' make_two_sided_barplot(stats_long)
+#' make_dodged_barplot(stats_long)
 #' }
 #' @export
-make_two_sided_barplot <- function(stats_long) {
+make_dodged_barplot <- function(stats_long) {
   stats_plot <- dplyr::mutate(
     stats_long,
-    signed_value = dplyr::if_else(time == "night", -value, value)
+    time = factor(time, levels = c("day", "night"))
   )
 
   ggplot2::ggplot(
     stats_plot,
-    ggplot2::aes(x = height, y = signed_value, fill = time)
+    ggplot2::aes(x = factor(height), y = value, fill = time)
   ) +
-    ggplot2::geom_col(width = 0.7, position = "identity") +
-    ggplot2::geom_hline(yintercept = 0, linewidth = 0.4) +
+    ggplot2::geom_col(
+      width = 0.7,
+      position = ggplot2::position_dodge(width = 0.75),
+      color = "black",
+      linewidth = 0.3
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c(
+        day = "#f9f0a1",
+        night = "#867493"
+      )
+    ) +
     ggplot2::facet_wrap(
       ~ statistic,
       scales = "free_y"
-    ) +
-    ggplot2::scale_y_continuous(
-      labels = abs
     ) +
     ggplot2::labs(
       x = "Flight altitude (m)",
@@ -272,3 +312,90 @@ make_two_sided_barplot <- function(stats_long) {
       legend.position = "bottom"
     )
 }
+
+#' Create violin plots of statistics by height and acquisition time
+#'
+#' Creates a faceted violin plot where each facet represents one statistic,
+#' the x-axis represents flight height, and day/night values are shown as
+#' side-by-side bars.
+#'
+#' @param stats_long A long-format data frame or tibble containing at least the
+#'   columns `time`, `height`, `statistic`, and `value`.
+#'
+#' @return A `ggplot` object.
+#'
+#' @details
+#' Values for `"day"` and `"night"` are plotted as positive bars and separated
+#' using a violion layout. This makes direct day-vs-night comparison possible
+#' within each flight-height category.
+#'
+#' The input should usually be produced by [reshape_statistics_long()].
+#'
+#' @examples
+#' \dontrun{
+#' stats_wide <- load_all_statistics("stats", "roi_stats")
+#' stats_long <- reshape_statistics_long(stats_wide)
+#' make_violin_plot(stats_long)
+#' }
+#' @export
+make_violin_plot <- function(stats_long) {
+  stats_plot <- dplyr::mutate(
+    stats_long,
+    time = factor(time, levels = c("day", "night"))
+  )
+
+  ggplot2::ggplot(
+    stats_plot,
+    ggplot2::aes(x = factor(height), y = value, fill = time)
+  ) +
+    ggplot2::geom_violin(
+      trim = FALSE,
+      alpha = 0.75,
+      color = "black",
+      linewidth = 0.3
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c(
+        day = "#f9f0a1",
+        night = "#867493"
+      )
+    ) +
+    ggplot2::facet_wrap(
+      ~ statistic,
+      scales = "free_y"
+    ) +
+    ggplot2::labs(
+      x = "Flight altitude (m)",
+      y = "Statistic value",
+      fill = "Time",
+      title = "Statistics by flight altitude and acquisition time"
+    ) +
+    ggplot2::theme_minimal(base_size = 12) +
+    ggplot2::theme(
+      panel.grid.major.x = ggplot2::element_blank(),
+      strip.text = ggplot2::element_text(face = "bold"),
+      legend.position = "bottom"
+    )
+}
+
+
+.required_stats_columns <- c(
+  "time" = "time",
+  "height" = "height"
+)
+
+.roi_stats <- c(
+  "Total number of points" = "n_pnts",
+  "Duplicated points (%)" = "dup_pnts_pct",
+  "First returns (%)" = "ret_1_pct",
+  "Second returns (%)" = "ret_2_pct",
+  "Third returns (%)" = "ret_3_pct",
+  "Points with only single returns (%)" = "ret_single_pct",
+  "Points with more than one return (%)" = "ret_abvone_pct",
+  "Points with negative heights (%)" = "pnts_negative_height_pct"
+)
+
+.target_stats <- c(
+  "RMSE" = "rmse_last",
+  "Intensity" = "intensity_avg"
+)
