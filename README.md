@@ -7,7 +7,9 @@ author: Cristian Iranzo
 
 # `lidaynight`: Day–night UAV LiDAR comparison tools
 
-This R package provides functions for comparing day and night LiDAR data collected using uncrewed aerial vehicles (UAVs).
+This R package provides functions for comparing day and night LiDAR data collected using unmanned aerial vehicles (UAVs).
+
+The [lidar-daynight-comparison](https://github.com/CristianICS/lidar-daynight-comparison) GitHub repository contains the workflow that uses this package.
 
 The package includes tools to:
 
