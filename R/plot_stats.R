@@ -20,6 +20,7 @@
 #' The function validates the folder name against the regular expression
 #' `"^(day|night)_(\\d+)$"`. If the folder name does not match this pattern, an
 #' error is raised.
+#' @export
 parse_folder_metadata <- function(folder_path) {
   folder_name <- fs::path_file(folder_path)
 
@@ -93,6 +94,7 @@ read_stats_csv <- function(folder_path, stat_prefix) {
 #' This function combines [parse_folder_metadata()] and [read_stats_csv()].
 #' It is intended for internal use by [load_all_statistics()], but can also be
 #' useful for testing individual folders.
+#' @export
 read_one_stats_folder <- function(folder_path, stat_prefix) {
   metadata <- parse_folder_metadata(folder_path)
   stats <- read_stats_csv(folder_path, stat_prefix)
@@ -122,6 +124,7 @@ read_one_stats_folder <- function(folder_path, stat_prefix) {
 #'
 #' @return A data frame containing the mandatory ordering columns and the
 #'   selected statistics columns.
+#' @export
 select_stats_columns <- function(stats, suffix, rename = TRUE) {
 
   stats_columns <- switch(
