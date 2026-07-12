@@ -27,7 +27,8 @@ openSpatial <- function(vector_path, ctg, layer_name = NULL) {
     if (!layer_name %in% layers) {
       layer_name <- layers[1]
       warning(
-        "Layer '", layer_name, "' not found. Using first layer: '", layers[1], "'."
+        "Layer '", layer_name, "' not found inside ", basename(vector_path),
+        ". Using first layer: '", layers[1], "'."
       )
     }
 
