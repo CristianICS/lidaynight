@@ -280,7 +280,7 @@ convertHeights <- function(
 #' @param pnt_height Ground reference height.
 #' @param incoh_thresh Heigh value acting as a threshold to determine invalid
 #'   heigh values.
-#' @noRd
+#' @export
 compute_target_metrics <- function(
     las,
     pnt_id,

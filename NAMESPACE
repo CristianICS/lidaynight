@@ -2,6 +2,7 @@
 
 export(checkTileGrid)
 export(compressLasFolder)
+export(compute_target_metrics)
 export(globalStats)
 export(groundClassification)
 export(load_all_statistics)
