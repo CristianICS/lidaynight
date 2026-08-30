@@ -61,6 +61,10 @@ targetStats <- function(
     stop("`incoh_thresh` must be a single non-negative numeric value.")
   }
 
+  # Used to keep output files from different buffer_m runs distinct.
+  # Expressed in whole centimeters to avoid punctuation in filenames.
+  buf_tag <- sprintf("buf%dcm", round(buffer_m * 100))
+
   ctg <- openCatalog(ctg_path)
 
   # Prevent to store the metrics in separate files
@@ -166,13 +170,15 @@ targetStats <- function(
       NA_real_
     )
 
+    out$buffer_m <- buffer_m
+
     # Aggregate by class.
-    class_stats[[cls_name]] <- aggregateByClass(out, cls_name)
+    class_stats[[cls_name]] <- aggregateByClass(out, cls_name, buffer_m)
 
     out_name <- if (ground_filter) {
-      paste("bytarget", "gf", cls_name, sep = "_")
+      paste("bytarget", "gf", cls_name, buf_tag, sep = "_")
     } else {
-      paste("bytarget", cls_name, sep = "_")
+      paste("bytarget", cls_name, buf_tag, sep = "_")
     }
 
     out_sf <- dplyr::left_join(
@@ -200,9 +206,9 @@ targetStats <- function(
     class_stats <- data.table::rbindlist(class_stats, use.names = TRUE)
 
     out_name <- if (ground_filter) {
-      "byclass_gf"
+      paste("byclass", "gf", buf_tag, sep = "_")
     } else {
-      "byclass"
+      paste("byclass", buf_tag, sep = "_")
     }
 
     utils::write.csv(
@@ -380,12 +386,14 @@ compute_target_metrics <- function(
 #'
 #' @param df Table with stats per target.
 #' @param cls_name The class name being aggregated.
+#' @param buffer_m Buffer radius in meters used to compute the stats.
 #' @noRd
-aggregateByClass <- function(df, cls_name) {
+aggregateByClass <- function(df, cls_name, buffer_m) {
   n_last_total <- sum(df$n_pnts_last, na.rm = TRUE)
 
   aggr <- data.frame(
     class = cls_name,
+    buffer_m = buffer_m,
     n_targets = nrow(df),
     n_targets_with_last = sum(df$n_pnts_last > 0L, na.rm = TRUE),
     n_pnts_last = n_last_total,
