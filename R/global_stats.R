@@ -205,7 +205,14 @@ roi_global_metrics <- function(
     length(X) == n &&
     length(Y) == n
   ) {
-    dup_pnts <- sum(duplicated(data.frame(X = X, Y = Y, Z = Z)))
+    dup_pnts <- as.integer(sum(
+      data.table::duplicated(
+        data.table::data.table(X = X, Y = Y, Z = Z),
+        by = c("X", "Y", "Z")
+      )
+    ))
+
+
   }
 
   stats <- list(
