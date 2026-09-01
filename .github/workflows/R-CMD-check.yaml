@@ -41,6 +41,12 @@ jobs:
           extra-repositories: |
             https://r-lidar.r-universe.dev
 
+      # System dependencies required by rlas on macOS
+      - name: Install macOS system dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install gdal
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
