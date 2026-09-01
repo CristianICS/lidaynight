@@ -8,12 +8,16 @@
 #' @param n_workers When parallel computation is activated, the number of worker
 #'   or CPU cores to use.
 #' @param parallel If `TRUE`, compute the new tiles in asynchronous way.
+#' @param outlier_filter If `TRUE`, remove elevation outliers (flyers) from
+#'   each chunk before ground classification, based on the 1st and 99th
+#'   percentiles of Z.
 #' @export
 groundClassification <- function(
   ctg_folder,
   overwrite=FALSE,
   n_workers=NULL,
-  parallel=FALSE
+  parallel=FALSE,
+  outlier_filter=FALSE
 ) {
 
   stopifnot(dir.exists(ctg_folder))
@@ -77,10 +81,42 @@ groundClassification <- function(
     }
   }
 
-  lidR::classify_ground(
-    ctg,
-    algorithm = lidR::ptd(res=20)
-  )
+  if (isTRUE(outlier_filter)) {
+    classify_chunk <- function(chunk) {
+      las <- lidR::readLAS(chunk)
+      if (lidR::is.empty(las)) return(NULL)
+
+      # Compute 1st and 99th percentile of Z to identify flyers
+      qq <- stats::quantile(
+        las$Z,
+        probs = c(0.01, 0.99),
+        na.rm = TRUE,
+        names = FALSE,
+        type = 7
+      )
+
+      # Keep only points within the quantile range
+      las_clean <- lidR::filter_poi(las, Z >= qq[1] & Z <= qq[2])
+
+      las_classified <- lidR::classify_ground(
+        las_clean,
+        algorithm = lidR::ptd(res=20)
+      )
+
+      lidR::remove_buffer(chunk, las_classified)
+    }
+
+    lidR::catalog_apply(
+      ctg,
+      classify_chunk,
+      .options = list(need_buffer = TRUE, automerge = TRUE)
+    )
+  } else {
+    lidR::classify_ground(
+      ctg,
+      algorithm = lidR::ptd(res=20)
+    )
+  }
 
   gc()
   invisible(output_folder)
