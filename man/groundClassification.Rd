@@ -8,7 +8,8 @@ groundClassification(
   ctg_folder,
   overwrite = FALSE,
   n_workers = NULL,
-  parallel = FALSE
+  parallel = FALSE,
+  outlier_filter = FALSE
 )
 }
 \arguments{
@@ -21,6 +22,10 @@ by default. Otherwise, set this to \code{TRUE}.}
 or CPU cores to use.}
 
 \item{parallel}{If \code{TRUE}, compute the new tiles in asynchronous way.}
+
+\item{outlier_filter}{If \code{TRUE}, remove outlier points (flyers) from each
+chunk before ground classification, using an isolated voxel filter
+(\code{lidR::ivf()}).}
 }
 \description{
 Classify ground points using Progressive TIN Densification (PTD) algorithm.
