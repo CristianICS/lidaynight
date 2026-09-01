@@ -41,10 +41,10 @@ these metrics are normally computed across different tiles. The percentages
 are computed in a later stage.
 
 The current function has been designed to include it inside
-\code{\link[lidR:aggregate]{lidR::plot_metrics()}}. The function clips each ROI,
+\code{\link[lidR:plot_metrics]{lidR::plot_metrics()}}. The function clips each ROI,
 computes cloud metrics, and binds the metrics back to the ROI geometry.
-It is documented as a wrapper around \code{\link[lidR:clip]{lidR::clip_roi()}},
-\code{\link[lidR:aggregate]{lidR::cloud_metrics()}}, and \code{cbind}, and its func argument is a
+It is documented as a wrapper around \code{\link[lidR:clip_roi]{lidR::clip_roi()}},
+\code{\link[lidR:cloud_metrics]{lidR::cloud_metrics()}}, and \code{cbind}, and its func argument is a
 formula/expression, not a \code{LAScluster} worker.
 }
 \details{

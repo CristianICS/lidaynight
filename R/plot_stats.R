@@ -395,7 +395,9 @@ make_violin_plot <- function(stats_long) {
   "Third returns (%)" = "ret_3_pct",
   "Points with only single returns (%)" = "ret_single_pct",
   "Points with more than one return (%)" = "ret_abvone_pct",
-  "Points with negative heights (%)" = "pnts_negative_height_pct"
+  "Points with negative heights (%)" = "pnts_negative_height_pct",
+  "Outliers below height 1st quantile" = "pnts_height_p01",
+  "Outliers above height 99th quantile" = "pnts_height_p99"
 )
 
 .target_stats <- c(

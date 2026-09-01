@@ -206,7 +206,7 @@ roi_global_metrics <- function(
     length(Y) == n
   ) {
     dup_pnts <- as.integer(sum(
-      data.table::duplicated(
+      base::duplicated(
         data.table::data.table(X = X, Y = Y, Z = Z),
         by = c("X", "Y", "Z")
       )
