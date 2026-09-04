@@ -2,6 +2,7 @@
 #'
 #' @param ctg_path Folder containing all the laz/las files.
 #' @param check If `TRUE`, display a [lidR::las_check()] message.
+#' @export
 openCatalog <- function(
     ctg_path,
     check = FALSE

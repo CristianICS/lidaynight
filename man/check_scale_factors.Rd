@@ -25,7 +25,7 @@ scale factors and offsets.
 Reads the header of every LAS/LAZ file in a folder and checks whether
 they all share the same X/Y/Z scale factor. Useful before deduplicating
 points merged from multiple flightlines/tiles (e.g. via
-\code{\link[lidR:filter_duplicates]{lidR::filter_duplicates()}} or \code{duplicated()}), since files quantized
+\code{\link[lidR:filters]{lidR::filter_duplicates()}} or \code{duplicated()}), since files quantized
 with different scale factors can decode the same physical point to
 different floating-point coordinates, causing missed duplicates
 (false negatives).
