@@ -25,14 +25,6 @@ retileCatalog <- function(
     parallel = TRUE
 ) {
 
-  ctg <- openCatalog(ctg_path)
-
-  # Do not let lidR create artificial processing chunks here.
-  lidR::opt_chunk_size(ctg) <- chunk_opts[["size"]]
-  lidR::opt_chunk_buffer(ctg) <- chunk_opts[["buffer"]]
-  lidR::opt_chunk_alignment(ctg) <- chunk_opts[["alignment"]]
-  lidR::opt_laz_compression(ctg) <- TRUE
-
   out_dir <- file.path(ctg_path, "retiled")
 
   if (!dir.exists(out_dir)) {
@@ -44,6 +36,14 @@ retileCatalog <- function(
     ))
     return(out_dir)
   }
+
+  ctg <- openCatalog(ctg_path)
+
+  # Do not let lidR create artificial processing chunks here.
+  lidR::opt_chunk_size(ctg) <- chunk_opts[["size"]]
+  lidR::opt_chunk_buffer(ctg) <- chunk_opts[["buffer"]]
+  lidR::opt_chunk_alignment(ctg) <- chunk_opts[["alignment"]]
+  lidR::opt_laz_compression(ctg) <- TRUE
 
   # Remove existing retiled LAS/LAZ files when overwrite = TRUE
   if (isTRUE(overwrite)) {
