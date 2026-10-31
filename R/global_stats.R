@@ -58,6 +58,16 @@ globalStats <- function(
 
   stats <- add_pct_metrics(stats)
 
+  # Return composition of the clean points, relative to the clean total
+  stats <- add_pct_metrics(
+    stats,
+    total_col = "n_pnts_clean",
+    pct_cols = paste0(
+      c("ret_1", "ret_2", "ret_3", "ret_single", "ret_abvone"),
+      "_clean"
+    )
+  )
+
   # Remove temporal data
   gc()
 
@@ -110,6 +120,10 @@ globalStats <- function(
 #' * Thresholds for the 1st and 99th quantile of heights
 #' * Points from 0 to 1st quantile
 #' * Points from 99th to last quantile
+#' * n_pnts_clean and ret_\*_clean = The same total and return counts, but
+#'   excluding duplicated points (all but the first occurrence of each X,Y,Z)
+#'   and points with NA or negative heights. Duplicates are only excluded when
+#'   `compute_duplicates = TRUE`.
 #'
 #' @note
 #' The parameters of the function are the LAS point properties required to
@@ -151,7 +165,13 @@ roi_global_metrics <- function(
       height_q01 = NA_real_,
       height_q99 = NA_real_,
       pnts_height_lt_q01 = NA_integer_,
-      pnts_height_gt_q99 = NA_integer_
+      pnts_height_gt_q99 = NA_integer_,
+      n_pnts_clean = 0L,
+      ret_1_clean = 0L,
+      ret_2_clean = 0L,
+      ret_3_clean = 0L,
+      ret_single_clean = 0L,
+      ret_abvone_clean = 0L
     )
     # Check if all the columns are present with the correct type, if FALSE an
     # error is returned
@@ -197,6 +217,7 @@ roi_global_metrics <- function(
   }
 
   dup_pnts <- NA_integer_
+  is_dup <- rep(FALSE, n)
 
   if (
     isTRUE(compute_duplicates) &&
@@ -205,15 +226,18 @@ roi_global_metrics <- function(
     length(X) == n &&
     length(Y) == n
   ) {
-    dup_pnts <- as.integer(sum(
-      base::duplicated(
-        data.table::data.table(X = X, Y = Y, Z = Z),
-        by = c("X", "Y", "Z")
-      )
-    ))
-
-
+    is_dup <- base::duplicated(
+      data.table::data.table(X = X, Y = Y, Z = Z),
+      by = c("X", "Y", "Z")
+    )
+    dup_pnts <- as.integer(sum(is_dup))
   }
+
+  # Points kept for the clean return composition: first occurrence of each
+  # duplicated X,Y,Z and non-negative heights
+  is_clean <- !is_dup & !is.na(Z) & Z >= 0
+  rn_clean <- ReturnNumber[is_clean]
+  nr_clean <- NumberOfReturns[is_clean]
 
   stats <- list(
     n_pnts = as.integer(n),
@@ -229,7 +253,13 @@ roi_global_metrics <- function(
     height_q01 = as.numeric(height_q01),
     height_q99 = as.numeric(height_q99),
     pnts_height_lt_q01 = as.integer(pnts_height_lt_q01),
-    pnts_height_gt_q99 = as.integer(pnts_height_gt_q99)
+    pnts_height_gt_q99 = as.integer(pnts_height_gt_q99),
+    n_pnts_clean = as.integer(sum(is_clean)),
+    ret_1_clean = as.integer(sum(rn_clean == 1L, na.rm = TRUE)),
+    ret_2_clean = as.integer(sum(rn_clean == 2L, na.rm = TRUE)),
+    ret_3_clean = as.integer(sum(rn_clean == 3L, na.rm = TRUE)),
+    ret_single_clean = as.integer(sum(nr_clean == 1L, na.rm = TRUE)),
+    ret_abvone_clean = as.integer(sum(nr_clean > 1L, na.rm = TRUE))
   )
 
   vctrs::vec_cast(stats, .global_stats_ptype)
@@ -239,23 +269,26 @@ roi_global_metrics <- function(
 #' Compute the percentage from the statistics related to the number of points
 #' @param stas The object returned from [lidR::plot_metrics()] function.
 #' @param total_col Name of the column containing the total number of points.
+#' @param pct_cols Count columns to convert into percentages of `total_col`.
 #' @noRd
-add_pct_metrics <- function(stats, total_col = "n_pnts") {
+add_pct_metrics <- function(
+    stats,
+    total_col = "n_pnts",
+    pct_cols = c(
+      "dup_pnts",
+      "ret_1",
+      "ret_2",
+      "ret_3",
+      "ret_single",
+      "ret_first",
+      "ret_abvone",
+      "pnts_na_height",
+      "pnts_negative_height",
+      "pnts_height_lt_q01",
+      "pnts_height_gt_q99"
+    )
+) {
   n <- stats[[total_col]]
-
-  pct_cols <- c(
-    "dup_pnts",
-    "ret_1",
-    "ret_2",
-    "ret_3",
-    "ret_single",
-    "ret_first",
-    "ret_abvone",
-    "pnts_na_height",
-    "pnts_negative_height",
-    "pnts_height_lt_q01",
-    "pnts_height_gt_q99"
-  )
 
   pct_cols <- intersect(pct_cols, names(stats))
 
@@ -287,5 +320,11 @@ add_pct_metrics <- function(stats, total_col = "n_pnts") {
   height_q01 = double(),
   height_q99 = double(),
   pnts_height_lt_q01 = integer(),
-  pnts_height_gt_q99 = integer()
+  pnts_height_gt_q99 = integer(),
+  n_pnts_clean = integer(),
+  ret_1_clean = integer(),
+  ret_2_clean = integer(),
+  ret_3_clean = integer(),
+  ret_single_clean = integer(),
+  ret_abvone_clean = integer()
 )

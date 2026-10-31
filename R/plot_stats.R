@@ -390,11 +390,13 @@ make_violin_plot <- function(stats_long) {
 .roi_stats <- c(
   "Total number of points" = "n_pnts",
   "Duplicated points (%)" = "dup_pnts_pct",
-  "First returns (%)" = "ret_1_pct",
-  "Second returns (%)" = "ret_2_pct",
-  "Third returns (%)" = "ret_3_pct",
-  "Points with only single returns (%)" = "ret_single_pct",
-  "Points with more than one return (%)" = "ret_abvone_pct",
+  # Return composition excludes duplicated and negative-height points, which
+  # are only reported in their own metrics
+  "First returns (%)" = "ret_1_clean_pct",
+  "Second returns (%)" = "ret_2_clean_pct",
+  "Third returns (%)" = "ret_3_clean_pct",
+  "Points with only single returns (%)" = "ret_single_clean_pct",
+  "Points with more than one return (%)" = "ret_abvone_clean_pct",
   "Points with negative heights (%)" = "pnts_negative_height_pct",
   "Outliers below height 1st quantile" = "pnts_height_lt_q01",
   "Outliers above height 99th quantile" = "pnts_height_gt_q99"
