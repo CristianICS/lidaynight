@@ -62,6 +62,10 @@ only 1-3 returns are computed.
 \item Thresholds for the 1st and 99th quantile of heights
 \item Points from 0 to 1st quantile
 \item Points from 99th to last quantile
+\item n_pnts_clean and ret_\*_clean = The same total and return counts, but
+excluding duplicated points (all but the first occurrence of each X,Y,Z)
+and points with NA or negative heights. Duplicates are only excluded when
+\code{compute_duplicates = TRUE}.
 }
 }
 \note{

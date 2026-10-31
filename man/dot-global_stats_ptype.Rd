@@ -5,7 +5,7 @@
 \alias{.global_stats_ptype}
 \title{Prototypes for all the files containing the computed stats}
 \format{
-An object of class \code{list} of length 14.
+An object of class \code{list} of length 20.
 }
 \usage{
 .global_stats_ptype
