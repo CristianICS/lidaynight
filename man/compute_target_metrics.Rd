@@ -17,7 +17,7 @@ compute_target_metrics(las, pnt_id, pnt_height, incoh_thresh)
 heigh values.}
 }
 \description{
-This function is called after \code{\link[lidR:clip]{lidR::clip_roi()}}, obtaining a list of point
+This function is called after \code{\link[lidR:clip_roi]{lidR::clip_roi()}}, obtaining a list of point
 clouds for each ground reference point. Call this function inside \code{\link[=Map]{Map()}}.
 }
 \details{
