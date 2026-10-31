@@ -389,24 +389,31 @@ compute_target_metrics <- function(
 #' @param buffer_m Buffer radius in meters used to compute the stats.
 #' @noRd
 aggregateByClass <- function(df, cls_name, buffer_m) {
-  n_last_total <- sum(df$n_pnts_last, na.rm = TRUE)
+  # Targets without a reference height have NA error sums; exclude them so
+  # their last returns do not inflate the denominator.
+  valid <- !is.na(df$sum_errs_last) & !is.na(df$sum_errs_last_sq)
+  df_valid <- df[valid, ]
+
+  n_last_total <- sum(df_valid$n_pnts_last, na.rm = TRUE)
+  sum_errs_total <- sum(df_valid$sum_errs_last)
+  sum_errs_sq_total <- sum(df_valid$sum_errs_last_sq)
 
   aggr <- data.frame(
     class = cls_name,
     buffer_m = buffer_m,
     n_targets = nrow(df),
-    n_targets_with_last = sum(df$n_pnts_last > 0L, na.rm = TRUE),
+    n_targets_with_last = sum(df_valid$n_pnts_last > 0L, na.rm = TRUE),
     n_pnts_last = n_last_total,
-    sum_errs_last = sum(df$sum_errs_last, na.rm = TRUE),
-    sum_errs_last_sq = sum(df$sum_errs_last_sq, na.rm = TRUE),
+    sum_errs_last = sum_errs_total,
+    sum_errs_last_sq = sum_errs_sq_total,
     rmse_last = ifelse(
       n_last_total > 0L,
-      sqrt(sum(df$sum_errs_last_sq, na.rm = TRUE) / n_last_total),
+      sqrt(sum_errs_sq_total / n_last_total),
       NA_real_
     ),
     bias_last = ifelse(
       n_last_total > 0L,
-      sum(df$sum_errs_last, na.rm = TRUE) / n_last_total,
+      sum_errs_total / n_last_total,
       NA_real_
     )
   )
