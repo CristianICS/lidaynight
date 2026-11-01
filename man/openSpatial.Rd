@@ -4,7 +4,7 @@
 \alias{openSpatial}
 \title{Read a spatial vector layer and align its CRS with a LAS catalog}
 \usage{
-openSpatial(vector_path, ctg, layer_name = NULL)
+openSpatial(vector_path, ctg = NULL, layer_name = NULL)
 }
 \arguments{
 \item{vector_path}{Path pointing to a file readable by \code{\link[sf:st_read]{sf::st_read()}}.}
