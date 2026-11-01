@@ -16,7 +16,7 @@
 #'
 #' @return An `sf` object (AOI) in the catalog CRS (if both CRSs are defined).
 #' @export
-openSpatial <- function(vector_path, ctg, layer_name = NULL) {
+openSpatial <- function(vector_path, ctg = NULL, layer_name = NULL) {
 
   # Open file and handle optional layer name
   if (is.null(layer_name)) {
@@ -25,11 +25,13 @@ openSpatial <- function(vector_path, ctg, layer_name = NULL) {
     layers <- sf::st_layers(vector_path)$name
 
     if (!layer_name %in% layers) {
-      layer_name <- layers[1]
       warning(
-        "Layer '", layer_name, "' not found inside ", basename(vector_path),
-        ". Using first layer: '", layers[1], "'."
+        "Layer '", layer_name, "' not found in '", basename(vector_path), "'. ",
+        "Available layers: ", paste0("'", layers, "'", collapse = ", "), ". ",
+        "Using first layer: '", layers[1], "'.",
+        call. = FALSE
       )
+      layer_name <- layers[1]
     }
 
     sf_obj <- sf::st_read(vector_path, layer=layer_name, quiet = TRUE)
